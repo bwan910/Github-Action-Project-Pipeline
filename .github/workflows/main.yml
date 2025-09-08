@@ -1,0 +1,31 @@
+name: Build and Deploy to k3s
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted   # Your VM with Docker + k3s
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PASS }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: docker.io/${{ secrets.DOCKER_USER }}/demo-docker-k8s:${{ github.sha }}
+
+      - name: Deploy to k3s
+        run: |
+          kubectl set image deployment/demo-docker-k8s-app-deployment demo-docker-k8s-container=docker.io/${{ secrets.DOCKER_USER }}/demo-docker-k8s:${{ github.sha }}
+          kubectl rollout status deployment/demo-docker-k8s-app-deployment
