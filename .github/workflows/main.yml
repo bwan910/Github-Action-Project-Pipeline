@@ -1,6 +1,6 @@
 name: Build and Deploy to k3s
 
-on:
+on: workflow_dispatch
   push:
     branches: [ "main" ]
 
