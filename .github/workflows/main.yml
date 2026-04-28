@@ -1,8 +1,22 @@
 name: Build and Deploy to k3s
 
-on: workflow_dispatch
+#on: workflow_dispatch
 
-
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+      image-tag:
+        description: 'Docker image tag to deploy'
+        required: true
+        type: string
+        default: 'latest'
 jobs:
   build-and-deploy:
     runs-on: self-hosted   # Your VM with Docker + k3s
